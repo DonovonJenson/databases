@@ -18,8 +18,6 @@ module.exports = {
       models.messages.get(res);
     }, // a function which handles a get request for all messages
     post: function (req, res) {
-      console.log('HANDLING MESSAGES POST:');
-      console.log(req);
       res.writeHead(201, headers);
       models.messages.post(req.body);
       res.end();

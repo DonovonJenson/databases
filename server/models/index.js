@@ -1,27 +1,44 @@
-var db = require('../db');
-db.connect();
+var Sequelize = require('sequelize');
+
+var db = new Sequelize('chat', 'student', 'student');
+/* TODO this constructor takes the database name, username, then password.
+ * Modify the arguments if you need to */
+
+/* first define the data structure by giving property names and datatypes
+ * See http://sequelizejs.com for other datatypes you can use besides STRING. */
+var User = db.define('User', {
+  username: Sequelize.STRING
+});
+User.sync();
+
+var Message = db.define('Message', {
+  // objectId: Sequelize.INTEGER,
+  username: Sequelize.STRING,
+  message: Sequelize.STRING,
+  roomname: Sequelize.STRING
+});
+Message.sync();
+
+
+
 module.exports = {
   messages: {
     get: function (res) {
-      db.query('SELECT * FROM messages', (err, results) => {
-        let obj = {};
-        obj.results = results;
-        res.end(JSON.stringify(obj));
-      });
-    }, // a function which produces all the messages
-    post: function (data) {
-      console.log('DATA : ' + data);
-      const one = db.escape(data.username);
-      const two = db.escape(data.message);
-      const three = db.escape(data.roomname);
-
-      db.query(`INSERT INTO messages (objectId, username, message, roomname) VALUES (NULL, ${one}, ${two}, ${three});`, 
-              (err, results) => {
-                if (err) {
-                  throw err;
-                }
+      Message.findAll({})
+              .then((results) => {
+                let obj = {};
+                obj.results = results;
+                res.end(JSON.stringify(obj));
               });
-    } // a function which can be used to insert a message into the database
+    },
+    post: function (data) {
+     // console.log('SOMETHING IMPORTANT:', data);
+      Message.create({
+        username: data.username, 
+        message: data.message, 
+        roomname: data.roomname
+      });
+    }
   },
 
   users: {
@@ -30,8 +47,7 @@ module.exports = {
       
     },
     post: function (data) {
-      db.query(`INSERT INTO messages (objectId, username) VALUES (NULL, ${data.username});`, 
-              (err, results) => {});
+      User.create({username: data.username});
     }
   }
 };
