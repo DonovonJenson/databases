@@ -4,17 +4,18 @@ module.exports = {
   messages: {
     get: function (res) {
       db.query('SELECT * FROM messages', (err, results) => {
-        results = JSON.stringify(results);
-        res.end(results);
+        let obj = {};
+        obj.results = results;
+        res.end(JSON.stringify(obj));
       });
     }, // a function which produces all the messages
     post: function (data) {
-
+      console.log('DATA : ' + data);
       const one = db.escape(data.username);
       const two = db.escape(data.message);
       const three = db.escape(data.roomname);
 
-      db.query(`INSERT INTO messages (ID, username, message, roomname) VALUES (NULL, ${one}, ${two}, ${three});`, 
+      db.query(`INSERT INTO messages (objectId, username, message, roomname) VALUES (NULL, ${one}, ${two}, ${three});`, 
               (err, results) => {
                 if (err) {
                   throw err;
@@ -29,7 +30,7 @@ module.exports = {
       
     },
     post: function (data) {
-      db.query(`INSERT INTO messages (ID, username) VALUES (NULL, ${data.username});`, 
+      db.query(`INSERT INTO messages (objectId, username) VALUES (NULL, ${data.username});`, 
               (err, results) => {});
     }
   }
